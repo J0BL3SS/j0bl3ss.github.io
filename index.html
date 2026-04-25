@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WRRdle</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Share+Tech+Mono&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <header>
+    <h1>WRR<span>.</span>dle</h1>
+    <p>War Robots Wordle</p>
+  </header>
+  <div class="meta-bar">
+    <span>Attempts</span>
+    <div class="attempts-dots" id="dots"></div>
+  </div>
+  <div id="result-banner"></div>
+  <div class="input-area">
+    <div id="search-wrap">
+      <input type="text" id="robot-input" placeholder="Type robot name..." autocomplete="off" spellcheck="false">
+      <div id="autocomplete"></div>
+    </div>
+    <button id="guess-btn">Guess</button>
+    <button id="new-game-btn">New</button>
+    <label class="mode-toggle" title="Hard Mode hides the Tier column">
+      <input type="checkbox" id="hard-mode-toggle">
+      <span class="mode-label" id="mode-label-text">Easy</span>
+    </label>
+  </div>
+  <div class="grid-container">
+    <div id="grid-bg"></div>
+    <div class="grid-header">
+      <span>Robot</span>
+      <span class="header-tier">Tier</span>
+      <span>Faction</span>
+      <span>Light</span>
+      <span>Medium</span>
+      <span>Heavy</span>
+    </div>
+    <div id="guess-rows"></div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+
+</html>

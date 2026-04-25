@@ -1,0 +1,564 @@
+:root {
+    --bg: #1a1a1a;
+    --surface: #262626;
+    --border: #ffcc00;
+    --text: #ffffff;
+    --dim: #888888;
+    --accent: #ffcc00;
+    --accent-dark: #b38f00;
+    --green: #2a9d5c;
+    --red: #c0392b;
+    --gold: #ffcc00;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Share Tech Mono', monospace;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 24px 16px 60px;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+header h1 {
+    font-family: 'Orbitron', monospace;
+    font-weight: 900;
+    font-size: clamp(1.8rem, 5vw, 3rem);
+    letter-spacing: 0.12em;
+    color: #fff;
+    text-shadow: 0 0 30px rgba(255, 204, 0, 0.4);
+}
+
+header h1 span {
+    color: var(--accent);
+}
+
+header p {
+    margin-top: 6px;
+    color: var(--dim);
+    font-size: 0.78rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+}
+
+/* GUESS INPUT */
+.input-area {
+    display: flex;
+    gap: 8px;
+    width: 100%;
+    max-width: 1000px;
+    margin-bottom: 20px;
+    position: relative;
+}
+
+#search-wrap {
+    flex: 1;
+    position: relative;
+}
+
+#robot-input {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.95rem;
+    padding: 12px 16px;
+    outline: none;
+    transition: border-color 0.2s;
+    letter-spacing: 0.05em;
+}
+
+#robot-input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 8px rgba(255, 204, 0, 0.2);
+}
+
+#autocomplete {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    background: #161616;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    z-index: 100;
+    max-height: 220px;
+    overflow-y: auto;
+}
+
+.ac-item {
+    padding: 10px 16px;
+    cursor: pointer;
+    font-size: 0.88rem;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid #333;
+    transition: background 0.1s;
+}
+
+.ac-item:last-child {
+    border-bottom: none;
+}
+
+.ac-item:hover,
+.ac-item.selected {
+    background: #2e2e2e;
+    color: var(--accent);
+}
+
+.ac-item.used {
+    color: var(--dim);
+    text-decoration: line-through;
+    cursor: default;
+}
+
+#guess-btn {
+    background: var(--accent);
+    border: none;
+    border-radius: 6px;
+    color: #1a1a1a;
+    cursor: pointer;
+    font-family: 'Orbitron', monospace;
+    font-size: 0.75rem;
+    font-weight: 1000;
+    letter-spacing: 0.1em;
+    padding: 12px 20px;
+    text-transform: uppercase;
+    transition: background 0.15s, transform 0.1s;
+    white-space: nowrap;
+}
+
+#guess-btn:hover {
+    background: #ffe066;
+}
+
+#guess-btn:active {
+    transform: scale(0.97);
+}
+
+#guess-btn:disabled {
+    background: var(--dim);
+    cursor: default;
+    color: #333;
+}
+
+/* NEW GAME */
+#new-game-btn {
+    background: transparent;
+    border: 1px solid var(--dim);
+    border-radius: 6px;
+    color: var(--dim);
+    cursor: pointer;
+    font-family: 'Orbitron', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    padding: 12px 16px;
+    text-transform: uppercase;
+    transition: all 0.15s;
+}
+
+#new-game-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+/* COLUMN HEADERS */
+.grid-container {
+    width: 100%;
+    max-width: 1000px;
+    position: relative;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+/* Robot background image */
+#grid-bg {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center top;
+    background-repeat: no-repeat;
+    opacity: 0.13;
+    pointer-events: none;
+    transition: background-image 0.4s ease;
+    z-index: 0;
+}
+
+.grid-header {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 1fr 70px 1fr 70px 70px 70px;
+    gap: 6px;
+    padding: 0 0 8px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 10px;
+}
+
+.grid-header span {
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--dim);
+    text-align: center;
+}
+
+.grid-header span:first-child {
+    text-align: left;
+    padding-left: 8px;
+}
+
+/* GUESS ROWS */
+#guess-rows {
+    position: relative;
+    z-index: 1;
+}
+
+.guess-row {
+    display: grid;
+    grid-template-columns: 1fr 70px 1fr 70px 70px 70px;
+    gap: 6px;
+    margin-bottom: 6px;
+    animation: rowIn 0.3s ease;
+}
+
+@keyframes rowIn {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.cell {
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 8px;
+    font-size: 0.78rem;
+    letter-spacing: 0.04em;
+    text-align: center;
+    border: 1px solid transparent;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+}
+
+.cell.name-cell {
+    justify-content: flex-start;
+    padding-left: 12px;
+    gap: 10px;
+    background: rgba(38, 38, 38, 0.82);
+    border-color: var(--border);
+    font-size: 0.82rem;
+    font-weight: bold;
+    color: #fff;
+}
+
+.cell.name-cell img {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 4px;
+    flex-shrink: 0;
+    background: var(--border);
+}
+
+.robot-placeholder {
+    width: 32px;
+    height: 32px;
+    border-radius: 4px;
+    background: var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 1rem;
+}
+
+.cell.correct {
+    background: rgba(42, 157, 92, 0.75);
+    border-color: #3dbe78;
+    color: #fff;
+}
+
+.cell.wrong {
+    background: rgba(30, 10, 10, 0.78);
+    border-color: var(--red);
+    color: #e07070;
+}
+
+.robot-img {
+    border: 2px solid #00bcd4;
+    border-radius: 10px;
+    padding: 4px;
+    background: #111;
+
+}
+
+.robot-icon {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    border: 2px solid;
+    /* Solid style, but color will be inherited */
+    border-color: inherit;
+    /* This pulls the color from .correct or .wrong */
+    border-radius: 4px;
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+/* FACTION CELL */
+.cell.faction-cell {
+    font-size: 0.72rem;
+    gap: 8px;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.faction-icon {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+    border-radius: 3px;
+    flex-shrink: 0;
+}
+
+.faction-icon-placeholder {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    opacity: 0.7;
+}
+
+/* ANSWER REVEAL */
+#result-banner {
+    width: 100%;
+    max-width: 1000px;
+    min-height: 400px;
+    margin-bottom: 16px;
+    border-radius: 8px;
+    padding: 20px 24px;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+    text-align: center;
+    animation: rowIn 0.4s ease;
+}
+
+#result-banner.win {
+    display: flex;
+    background: linear-gradient(135deg, #0d2b1a, #162d1e);
+    border: 1px solid var(--green);
+}
+
+#result-banner.lose {
+    display: flex;
+    background: linear-gradient(135deg, #1e0d0d, #2a1010);
+    border: 1px solid var(--red);
+}
+
+#result-banner .result-label {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.1rem;
+    font-weight: 900;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+}
+
+.win .result-label {
+    color: #4ddb88;
+}
+
+.lose .result-label {
+    color: #e07070;
+}
+
+#result-banner .answer-name {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #fff;
+}
+
+#result-banner .sub {
+    font-size: 0.75rem;
+    color: var(--dim);
+    letter-spacing: 0.1em;
+}
+
+/* ATTEMPTS COUNTER */
+.meta-bar {
+    width: 100%;
+    max-width: 1000px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    padding: 0 2px;
+}
+
+.meta-bar span {
+    font-size: 0.72rem;
+    color: var(--dim);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+}
+
+.attempts-dots {
+    display: flex;
+    gap: 5px;
+}
+
+.dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #333;
+    border: 1px solid var(--dim);
+    transition: background 0.2s;
+}
+
+.dot.used {
+    background: var(--accent);
+    border-color: var(--accent);
+}
+
+.dot.win {
+    background: var(--green);
+    border-color: var(--green);
+}
+
+.dot.lose {
+    background: var(--red);
+    border-color: var(--red);
+}
+
+/* SCROLLBAR */
+::-webkit-scrollbar {
+    width: 4px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 2px;
+}
+
+/* SHIMMER ON CORRECT */
+@keyframes shimmer {
+    0% {
+        box-shadow: 0 0 0 rgba(255, 204, 0, 0);
+    }
+
+    50% {
+        box-shadow: 0 0 16px rgba(255, 204, 0, 0.35);
+    }
+
+    100% {
+        box-shadow: 0 0 0 rgba(255, 204, 0, 0);
+    }
+}
+
+.cell.correct {
+    animation: shimmer 0.8s ease 0.1s;
+}
+
+/* MODE TOGGLE */
+.mode-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.mode-toggle input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 36px;
+    height: 20px;
+    background: #333;
+    border: 1px solid var(--dim);
+    border-radius: 10px;
+    position: relative;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+    flex-shrink: 0;
+}
+
+.mode-toggle input[type="checkbox"]::after {
+    content: '';
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    background: var(--dim);
+    border-radius: 50%;
+    top: 2px;
+    left: 2px;
+    transition: transform 0.2s, background 0.2s;
+}
+
+.mode-toggle input[type="checkbox"]:checked {
+    background: rgba(192, 57, 43, 0.25);
+    border-color: var(--red);
+}
+
+.mode-toggle input[type="checkbox"]:checked::after {
+    transform: translateX(16px);
+    background: var(--red);
+}
+
+.mode-toggle .mode-label {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--dim);
+    transition: color 0.2s;
+    white-space: nowrap;
+}
+
+.mode-toggle input[type="checkbox"]:checked~.mode-label {
+    color: var(--red);
+}
+
+/* HARD MODE: hide tier column (2nd column) */
+body.hard-mode .grid-header,
+body.hard-mode .guess-row {
+    grid-template-columns: 1fr 1fr 70px 70px 70px;
+}
+
+body.hard-mode .grid-header span.header-tier,
+body.hard-mode .cell.tier-cell {
+    display: none;
+}
